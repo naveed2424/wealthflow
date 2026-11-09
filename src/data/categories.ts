@@ -1,0 +1,58 @@
+import { BlogCategory } from '../types/blog';
+
+export const BLOG_CATEGORIES: BlogCategory[] = [
+  {
+    id: 'ai-budgeting-trackers',
+    name: 'AI Budgeting & Money Trackers',
+    slug: 'ai-budgeting-trackers',
+    description: 'Next-gen automated spending categorizers, receipt OCR engines, and predictive cash-flow forecasting tools.',
+    iconName: 'PieChart',
+    gradient: 'from-emerald-500 to-teal-700',
+    accentColor: '#10b981',
+  },
+  {
+    id: 'smart-saving-frugal-tech',
+    name: 'Smart Saving & Frugal Living Tech',
+    slug: 'smart-saving-frugal-tech',
+    description: 'Algorithmic micro-saving engines, automated utility negotiators, coupon scrapers, and subscription stoppers.',
+    iconName: 'PiggyBank',
+    gradient: 'from-amber-400 to-emerald-600',
+    accentColor: '#f59e0b',
+  },
+  {
+    id: 'wealth-building-investing-ai',
+    name: 'Wealth Building & Investing AI',
+    slug: 'wealth-building-investing-ai',
+    description: 'Robo-advisors, quantitative portfolio rebalancing, dividend tracking algorithms, and AI market sentiment scanners.',
+    iconName: 'TrendingUp',
+    gradient: 'from-blue-500 to-indigo-700',
+    accentColor: '#3b82f6',
+  },
+  {
+    id: 'debt-elimination-credit-ai',
+    name: 'Debt Elimination & Credit Optimization',
+    slug: 'debt-elimination-credit-ai',
+    description: 'AI debt avalanche simulators, interest rate negotiators, and automated credit score repair algorithms.',
+    iconName: 'ShieldAlert',
+    gradient: 'from-rose-500 to-pink-700',
+    accentColor: '#f43f5e',
+  },
+  {
+    id: 'side-hustles-ai-income',
+    name: 'Side Hustles & AI Income Streams',
+    slug: 'side-hustles-ai-income',
+    description: 'Leveraging autonomous AI agents, digital asset automation, and scalable freelance workflows to boost monthly cash flow.',
+    iconName: 'Sparkles',
+    gradient: 'from-purple-500 to-violet-700',
+    accentColor: '#8b5cf6',
+  },
+  {
+    id: 'future-of-money-fintech',
+    name: 'Future of Money & FinTech News',
+    slug: 'future-of-money-fintech',
+    description: 'Deep dives on Central Bank Digital Currencies (CBDCs), open banking protocols, AI fraud defense, and macroeconomic trends.',
+    iconName: 'Globe',
+    gradient: 'from-cyan-500 to-blue-700',
+    accentColor: '#06b6d4',
+  },
+];

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Defensive initialization: ensure window.fetch has both a getter and setter
+      // so browser extensions (requests interceptors) don't throw TypeError: Cannot set property fetch
+      (function() {
+        try {
+          var currentFetch = window.fetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() { return currentFetch; },
+            set: function(fn) { currentFetch = fn; },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (e) {}
+
+        // Suppress external extension injection errors from bubbling
+        window.addEventListener('error', function(e) {
+          if (e && (
+            (e.filename && e.filename.indexOf('chrome-extension://') !== -1) ||
+            (e.message && e.message.indexOf('Cannot set property fetch') !== -1)
+          )) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            return true;
+          }
+        }, true);
+      })();
+    </script>
+    <title>WealthFlow AI – Daily Expense Tracker, 50/30/20 Budgeting & Smart Money Tools</title>
+    <meta name="description" content="Track daily life expenses, stop lifestyle inflation, simulate wealth compounding, and explore high-ranking SEO insights on modern AI financial tools." />
+    <meta name="keywords" content="daily expense tracker, 50 30 20 budget calculator, personal finance tools, save money daily, coffee factor calculator, lifestyle inflation, automated wealth tools" />
+    <meta name="author" content="WealthFlow Editorial Team" />
+    <link rel="canonical" href="https://ais-dev-jaqzasdnamfwsy27pcee4a-128012116128.europe-west2.run.app" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="WealthFlow AI – Daily Expense Tracker, 50/30/20 Budgeting & Smart Money Tools" />
+    <meta property="og:description" content="Track daily life expenses, stop lifestyle inflation, simulate wealth compounding, and explore high-ranking SEO insights on modern AI financial tools." />
+    <meta property="og:site_name" content="WealthFlow AI" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="WealthFlow AI – Daily Expense Tracker, 50/30/20 Budgeting & Smart Money Tools" />
+    <meta name="twitter:description" content="Track daily life expenses, stop lifestyle inflation, simulate wealth compounding, and explore high-ranking SEO insights on modern AI financial tools." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://ais-dev-jaqzasdnamfwsy27pcee4a-128012116128.europe-west2.run.app/#webapp",
+          "name": "FinAI Wealth & Smart Budgeting Portal",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "All",
+          "description": "Smart personal finance tracker, spending analytics, savings compounding simulator, and AI budgeting tools directory.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "Blog",
+          "@id": "https://ais-dev-jaqzasdnamfwsy27pcee4a-128012116128.europe-west2.run.app/#blog",
+          "name": "FinAI Wealth Insights & Daily AI Tools Research",
+          "description": "Daily in-depth, journalistic research articles on AI tools revolutionizing personal finance, automated savings, and wealth creation."
+        }
+      ]
+    }
+    </script>
+  </head>
+  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500 selection:text-slate-950">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

@@ -1,0 +1,6 @@
+{
+  "name": "FinAI Wealth & Smart Budgeting Portal",
+  "description": "Personal finance tracker, interactive budgeting & savings simulator, and an SEO-rich blogging portal with daily AI content research and AdSense optimization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
