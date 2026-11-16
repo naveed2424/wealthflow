@@ -52,15 +52,16 @@ export default function App() {
   const [adSenseEnabled, setAdSenseEnabled] = useState<boolean>(true);
   const [showMoneyAnimation, setShowMoneyAnimation] = useState<boolean>(true);
 
-  // Blog posts database with LocalStorage persistence and automatic default sync
+  // Blog posts database with LocalStorage persistence and automatic default sync (newest first)
   const [articles, setArticles] = useState<BlogPost[]>(() => {
+    const newestFirstDefaults = [...INITIAL_BLOG_POSTS].reverse();
     const saved = localStorage.getItem('finai_articles');
     if (saved) {
       try {
         const parsed: BlogPost[] = JSON.parse(saved);
         const existingIds = new Set(parsed.map(p => p.id));
-        const missingDefaults = INITIAL_BLOG_POSTS.filter(p => !existingIds.has(p.id));
-        const merged = [...parsed, ...missingDefaults];
+        const missingDefaults = newestFirstDefaults.filter(p => !existingIds.has(p.id));
+        const merged = [...missingDefaults, ...parsed];
         if (missingDefaults.length > 0) {
           localStorage.setItem('finai_articles', JSON.stringify(merged));
         }
@@ -69,7 +70,7 @@ export default function App() {
         console.error(e);
       }
     }
-    return INITIAL_BLOG_POSTS;
+    return newestFirstDefaults;
   });
 
   const [selectedArticle, setSelectedArticle] = useState<BlogPost | null>(null);
@@ -149,6 +150,12 @@ export default function App() {
         currentTab={activeTab}
         onSelectTab={(tab) => {
           setActiveTab(tab);
+          setSelectedArticle(null);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenAboutUs={() => {
+          setStaticPage('about');
+          setActiveTab('static');
           setSelectedArticle(null);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
@@ -260,26 +267,22 @@ export default function App() {
                 <div className="flex items-center gap-3 overflow-x-auto py-2.5 px-4 rounded-2xl bg-slate-950/90 border border-amber-500/20 text-xs text-slate-300 shadow-md">
                   <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-[10px] uppercase tracking-wider shrink-0 shadow-sm">
                     <Zap className="w-3.5 h-3.5 fill-slate-950" />
-                    Live Editorial Ticker
+                    US Google Trends Live
                   </span>
                   <span className="text-amber-300 font-bold shrink-0">
-                    🔥 Trending: The 2026 "House Money" Playbook (2,260 Words)
+                    📉 Market: Nvidia Capex Reckoning &amp; S&amp;P 500 Bifurcation
                   </span>
                   <span className="text-slate-600">•</span>
                   <span className="text-emerald-400 font-semibold shrink-0">
-                    🏡 New: Modular ADU House Hacking Slashes Mortgages 60%
+                    💰 Saving: Build a 2027 Cash Fortress &amp; Save $3,400/yr on Leaks
                   </span>
                   <span className="text-slate-600">•</span>
                   <span className="text-slate-300 shrink-0">
-                    NAR Data: 42% of closed sales feature seller rate buydowns
+                    ₿ Crypto Future: $5B RWA Token Supercycle &amp; Spot ETF Flows
                   </span>
                   <span className="text-slate-600">•</span>
                   <span className="text-amber-400 font-semibold shrink-0">
-                    High-yield cash stacks yield 5.2% risk-free
-                  </span>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-slate-400 shrink-0">
-                    All guides 100% fact-checked & SEO-optimized
+                    🤖 AI Agent Wallets &amp; GENIUS Act Stablecoin Rails
                   </span>
                 </div>
 

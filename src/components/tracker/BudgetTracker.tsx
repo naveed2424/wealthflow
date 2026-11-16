@@ -8,11 +8,88 @@ import {
   Receipt, 
   Calendar, 
   AlertCircle,
-  AlertTriangle
+  AlertTriangle,
+  BarChart3
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  Cell,
+} from 'recharts';
 import { Transaction, ExpenseCategory, BudgetRuleType, AIAdvisorInsight } from '../../types/finance';
 import { BudgetAlertToast } from '../common/BudgetAlertToast';
 import { SavingsMilestones } from './SavingsMilestones';
+
+interface RuleDistributionDatum {
+  name: string;
+  ruleType: BudgetRuleType;
+  actual: number;
+  target: number;
+  pctOfIncome: number;
+  targetPct: number;
+  color: string;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value?: number;
+    dataKey?: string;
+    payload?: RuleDistributionDatum;
+  }>;
+  currencySymbol: string;
+}
+
+const BudgetRuleTooltip: React.FC<CustomTooltipProps> = ({ active, payload, currencySymbol }) => {
+  if (!active || !payload || payload.length === 0) return null;
+  const datum = payload[0]?.payload;
+  if (!datum) return null;
+
+  const delta = datum.actual - datum.target;
+  const isSavings = datum.ruleType === 'Savings/Debt';
+  const isPositiveStatus = isSavings ? delta >= 0 : delta <= 0;
+
+  return (
+    <div className="bg-slate-950/95 border border-amber-500/40 rounded-2xl p-3.5 shadow-2xl shadow-amber-500/10 min-w-[215px]">
+      <div className="flex items-center justify-between gap-3 mb-2 pb-1.5 border-b border-slate-800">
+        <span className="text-xs font-bold text-white flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: datum.color }} />
+          {datum.name}
+        </span>
+        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
+          {datum.targetPct}% Goal
+        </span>
+      </div>
+      <div className="space-y-1.5 text-xs">
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-slate-400">Actual Spent:</span>
+          <span className="font-bold text-white">
+            {currencySymbol}{datum.actual.toLocaleString()} ({datum.pctOfIncome}%)
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-slate-400">50/30/20 Target:</span>
+          <span className="font-semibold text-slate-300">
+            {currencySymbol}{datum.target.toLocaleString()}
+          </span>
+        </div>
+        <div className="pt-1.5 mt-1 border-t border-slate-800/80 flex items-center justify-between gap-4">
+          <span className="text-slate-400">Variance:</span>
+          <span className={`font-bold ${isPositiveStatus ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {delta > 0 ? `+${currencySymbol}${delta.toLocaleString()}` : delta < 0 ? `-${currencySymbol}${Math.abs(delta).toLocaleString()}` : `${currencySymbol}0`}{' '}
+            {isSavings ? (delta >= 0 ? 'surplus' : 'shortfall') : (delta > 0 ? 'over' : 'under')}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface BudgetTrackerProps {
   currencySymbol: string;
@@ -69,6 +146,11 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({
   const [isRecurring, setIsRecurring] = useState(false);
   const [filterRule, setFilterRule] = useState<string>('all');
 
+  const today = new Date();
+  const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+  const localTodayStr = `${currentMonthKey}-${String(today.getDate()).padStart(2, '0')}`;
+  const currentMonthLabel = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
   const saveTransactions = (updated: Transaction[]) => {
     setTransactions(updated);
     localStorage.setItem('finai_transactions', JSON.stringify(updated));
@@ -85,7 +167,7 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({
       amount: amountVal,
       category: newCategory,
       ruleType: newRuleType,
-      date: new Date().toISOString().split('T')[0],
+      date: localTodayStr,
       isRecurring,
     };
 
@@ -98,6 +180,12 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({
   const handleDeleteTransaction = (id: string) => {
     saveTransactions(transactions.filter(t => t.id !== id));
   };
+
+  // Current-month transactions & 50/30/20 distribution for Recharts bar chart
+  const currentMonthTransactions = useMemo(
+    () => transactions.filter(t => t.date.startsWith(currentMonthKey)),
+    [transactions, currentMonthKey]
+  );
 
   // Calculations
   const totalSpent = useMemo(() => {
@@ -116,6 +204,57 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({
   const wantsPercent = income > 0 ? Math.round((wantsSpent / income) * 100) : 0;
   const savingsPercent = income > 0 ? Math.round((savingsSpent / income) * 100) : 0;
 
+  const currentMonthTotalSpent = useMemo(
+    () => currentMonthTransactions.reduce((acc, t) => acc + t.amount, 0),
+    [currentMonthTransactions]
+  );
+
+  const ruleDistributionData: RuleDistributionDatum[] = useMemo(() => {
+    const monthNeeds = currentMonthTransactions
+      .filter(t => t.ruleType === 'Needs')
+      .reduce((sum, t) => sum + t.amount, 0);
+    const monthWants = currentMonthTransactions
+      .filter(t => t.ruleType === 'Wants')
+      .reduce((sum, t) => sum + t.amount, 0);
+    const monthSavings = currentMonthTransactions
+      .filter(t => t.ruleType === 'Savings/Debt')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const needsTarget = Math.round(income * 0.5);
+    const wantsTarget = Math.round(income * 0.3);
+    const savingsTargetAmt = Math.round(income * 0.2);
+
+    return [
+      {
+        name: 'Needs (50%)',
+        ruleType: 'Needs',
+        actual: Math.round(monthNeeds),
+        target: needsTarget,
+        pctOfIncome: income > 0 ? Math.round((monthNeeds / income) * 100) : 0,
+        targetPct: 50,
+        color: monthNeeds > needsTarget ? '#f43f5e' : '#3b82f6',
+      },
+      {
+        name: 'Wants (30%)',
+        ruleType: 'Wants',
+        actual: Math.round(monthWants),
+        target: wantsTarget,
+        pctOfIncome: income > 0 ? Math.round((monthWants / income) * 100) : 0,
+        targetPct: 30,
+        color: monthWants > wantsTarget ? '#f43f5e' : '#fbbf24',
+      },
+      {
+        name: 'Savings/Debt (20%)',
+        ruleType: 'Savings/Debt',
+        actual: Math.round(monthSavings),
+        target: savingsTargetAmt,
+        pctOfIncome: income > 0 ? Math.round((monthSavings / income) * 100) : 0,
+        targetPct: 20,
+        color: '#10b981',
+      },
+    ];
+  }, [currentMonthTransactions, income]);
+
   // Category breakdown for chart
   const categoryTotals = useMemo(() => {
     const map: Record<string, number> = {};
@@ -126,7 +265,6 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({
   }, [transactions]);
 
   // Days left in current month calculation for safe daily spend
-  const today = new Date();
   const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
   const daysRemaining = Math.max(1, daysInMonth - today.getDate() + 1);
   const remainingDiscretionary = Math.max(0, income * 0.3 - wantsSpent);
@@ -181,7 +319,7 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({
                     amount: Math.round(neededAmount),
                     category: 'Housing & Rent',
                     ruleType: 'Needs',
-                    date: new Date().toISOString().split('T')[0],
+                    date: localTodayStr,
                   };
                   saveTransactions([breachTx, ...transactions]);
                 }
@@ -437,6 +575,121 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({
               💡 Tip: Automated micro-sweeping of just <strong>{currencySymbol}5/day</strong> adds <strong>{currencySymbol}1,825</strong> to annual net worth.
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* Recharts 50/30/20 Monthly Spending Distribution Bar Chart */}
+      <div className="bg-slate-900/80 border border-amber-500/20 rounded-3xl p-6 sm:p-8 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                <BarChart3 className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">
+                  50/30/20 Spending Distribution — {currentMonthLabel}
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Current-month actual outflows compared against your 50/30/20 target budget caps
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-950 text-slate-300 border border-slate-800">
+              {currentMonthTransactions.length} {currentMonthTransactions.length === 1 ? 'entry' : 'entries'} this month
+            </span>
+            <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-300 border border-amber-500/30">
+              Month Total: {currencySymbol}{currentMonthTotalSpent.toLocaleString()}
+            </span>
+          </div>
+        </div>
+
+        <div className="h-72 sm:h-80 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={ruleDistributionData}
+              margin={{ top: 12, right: 16, left: 4, bottom: 8 }}
+              barGap={8}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+              <XAxis
+                dataKey="name"
+                stroke="#94a3b8"
+                tick={{ fill: '#e2e8f0', fontSize: 12, fontWeight: 600 }}
+                axisLine={{ stroke: '#334155' }}
+                tickLine={false}
+              />
+              <YAxis
+                stroke="#94a3b8"
+                tick={{ fill: '#94a3b8', fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(value: number) =>
+                  `${currencySymbol}${value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value}`
+                }
+              />
+              <Tooltip
+                cursor={{ fill: 'rgba(245, 158, 11, 0.08)' }}
+                content={<BudgetRuleTooltip currencySymbol={currencySymbol} />}
+              />
+              <Legend
+                wrapperStyle={{ paddingTop: '12px', fontSize: '12px', color: '#cbd5e1' }}
+              />
+              <Bar
+                dataKey="target"
+                name="50/30/20 Target Cap"
+                fill="#334155"
+                stroke="#64748b"
+                strokeWidth={1}
+                radius={[8, 8, 0, 0]}
+                maxBarSize={56}
+              />
+              <Bar
+                dataKey="actual"
+                name="Actual Spent (Current Month)"
+                radius={[8, 8, 0, 0]}
+                maxBarSize={56}
+              >
+                {ruleDistributionData.map((entry) => (
+                  <Cell key={entry.ruleType} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-5 border-t border-slate-800/80">
+          {ruleDistributionData.map((item) => {
+            const isSavings = item.ruleType === 'Savings/Debt';
+            const isOver = !isSavings && item.actual > item.target;
+            return (
+              <div
+                key={item.ruleType}
+                className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between gap-3"
+              >
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-white">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                    {item.name}
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-1">
+                    {currencySymbol}{item.actual.toLocaleString()} of {currencySymbol}{item.target.toLocaleString()}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className={`text-sm font-black ${isOver ? 'text-rose-400' : 'text-amber-300'}`}>
+                    {item.pctOfIncome}%
+                  </div>
+                  <div className="text-[10px] text-slate-500">
+                    of income
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

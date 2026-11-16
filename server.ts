@@ -3,6 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Type } from '@google/genai';
+import { REGISTERED_SEO_PROMPT } from './src/data/registeredSeoPrompt';
 
 dotenv.config();
 
@@ -15,6 +16,10 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', service: 'wealthflow-api', timestamp: new Date().toISOString() });
 });
 
+app.get('/api/seo-prompt', (_req, res) => {
+  res.json({ success: true, registeredPrompt: REGISTERED_SEO_PROMPT });
+});
+
 // Shared server-side Gemini client
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -25,25 +30,27 @@ const ai = new GoogleGenAI({
   },
 });
 
-// Curated stock financial and AI imagery for realistic media embedding
+// Curated unique stock financial, market, saving & crypto imagery (fresh verified URLs)
 const fallbackImages = [
-  'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1634733988138-bf2c3a2a13fa?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1589758438368-0ad531db3366?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1639815188546-c43c240ff4df?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1559526324-593bc073d938?auto=format&fit=crop&w=1200&q=80',
 ];
 
-// Endpoint: Generate high-ranking, 2000+ words SEO article following user's structured SEO Prompt
+// Endpoint: Generate high-ranking, 2000+ words SEO article following registered Master SEO Prompt
 app.post('/api/generate-blog', async (req, res) => {
   try {
     const { prompt: userPrompt, categoryHint } = req.body;
-    const topicInstruction = userPrompt || "Write today's best and trending topic in AI Tools & Personal Finance / Budgeting";
+    const topicInstruction = userPrompt || REGISTERED_SEO_PROMPT.dailyTriggerCommand;
 
-    const systemPrompt = `You are an elite financial journalist, SEO expert, and content strategist for 'FinAI Wealth & Smart Budgeting Portal'.
-Your mission is to produce a comprehensive, deep-dive, engaging, and 100% fact-based article adhering to the following strict SEO format.
-Target Word Count: Minimum 1,800 to 2,200 words of rich, substantive, informative text (do not write short placeholders).
+    const systemPrompt = `You are an elite financial journalist, SEO expert, and content strategist for 'WealthFlow AI — Personal Finance, Market, Savings & AI Tools Portal'.
+Follow the user's REGISTERED MASTER SEO PROMPT (Version ${REGISTERED_SEO_PROMPT.version}) strictly for this and all future advanced blog posts:
+
+=== REGISTERED MASTER SEO PROMPT ===
+${REGISTERED_SEO_PROMPT.masterPromptTemplate}
+=====================================
 
 Categories available (must pick the best fit):
 1. AI Budgeting & Money Trackers
@@ -53,23 +60,14 @@ Categories available (must pick the best fit):
 5. Side Hustles & AI Income Streams
 6. Future of Money & FinTech News
 
-CONTENT REQUIREMENTS:
-1. Highly clickable, emotional, CTR-focused Headline.
-2. Engaging Hook & Intro explaining why this matters right now in 2025/2026.
-3. Detailed background context for beginners.
-4. 4 to 6 comprehensive sections with H2 & H3s, covering:
-   - Latest developments, algorithms, and real breakthrough apps
-   - Key financial statistics, benchmarks, and data
-   - Expert insights and industry commentary
-   - Real-world economic & personal lifestyle impact
-5. In-content Image Suggestions with rich ALT TEXT (CTR & SEO optimized) and Placement instructions.
-6. Primary keyword and 3-6 secondary keywords naturally integrated.
-7. Meta Title (50-60 chars) & Meta Description (150-160 chars).
-8. 2-5 Internal linking recommendations within the portal (e.g., /tracker, /savings-simulator, /category/smart-saving).
-9. 1-3 External authoritative references (e.g., Federal Reserve reports, MIT FinTech Lab, Bloomberg, Morningstar).
-10. Bulleted Key Takeaways summary.
-11. FAQ section with 3-4 practical questions and answers.
-12. Inspiring conclusion with future outlook and engagement Call to Action (CTA).`;
+INTERNAL ROUTES FOR LINKING:
+- /tracker (50/30/20 Budget & Milestones Tracker)
+- /savings-simulator (Compound Savings Simulator)
+- /daily-tools (Daily Life Expense Tools & Money Flow)
+- /category/ai-budgeting-trackers
+- /category/smart-saving-frugal-tech
+- /category/wealth-building-investing-ai
+- /category/future-of-money-fintech`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-3.8-flash',

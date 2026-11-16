@@ -14,13 +14,15 @@ import {
   TrendingUp,
   Lock,
   Flame,
-  Zap
+  Zap,
+  Users
 } from 'lucide-react';
 import { BLOG_CATEGORIES } from '../data/categories';
 
 interface NavbarProps {
   currentTab: 'tracker' | 'simulator' | 'blog' | 'daily-tools' | 'static';
   onSelectTab: (tab: 'tracker' | 'simulator' | 'blog' | 'daily-tools') => void;
+  onOpenAboutUs?: () => void;
   onOpenPublisherPortal: () => void;
   currencySymbol: string;
   onChangeCurrency: (symbol: string) => void;
@@ -32,6 +34,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   currentTab,
   onSelectTab,
+  onOpenAboutUs,
   onOpenPublisherPortal,
   currencySymbol,
   onChangeCurrency,
@@ -162,6 +165,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               )}
             </div>
+
+            {onOpenAboutUs && (
+              <button
+                onClick={onOpenAboutUs}
+                className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                  currentTab === 'static'
+                    ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
+                }`}
+              >
+                <Users className="w-4 h-4 text-amber-400" />
+                About Us
+              </button>
+            )}
           </nav>
 
           {/* Right utility buttons: Currency, AdSense Preview Toggle, Discreet Publisher Portal */}
@@ -258,6 +275,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               AI Tools Blog
             </button>
+            {onOpenAboutUs && (
+              <button
+                onClick={() => { onOpenAboutUs(); setMobileMenuOpen(false); }}
+                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold ${
+                  currentTab === 'static' ? 'bg-amber-950/60 text-amber-300' : 'text-slate-300'
+                }`}
+              >
+                About Us (Naveed)
+              </button>
+            )}
 
             <div className="pt-2 border-t border-slate-800 flex items-center justify-between px-2">
               <span className="text-xs text-slate-400">AdSense Preview</span>
