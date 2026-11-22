@@ -22,6 +22,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post, onSelect, featured = f
           src={post.featuredImage.url}
           alt={post.featuredImage.alt}
           loading="lazy"
+          referrerPolicy="no-referrer"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
@@ -80,6 +81,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post, onSelect, featured = f
             <img
               src={post.author.avatar}
               alt={post.author.name}
+              referrerPolicy="no-referrer"
               className="w-7 h-7 rounded-full object-cover border border-emerald-500/30"
             />
             <div>

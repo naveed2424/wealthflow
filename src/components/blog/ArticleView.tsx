@@ -214,6 +214,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
               <img
                 src={post.author.avatar}
                 alt={post.author.name}
+                referrerPolicy="no-referrer"
                 className="w-12 h-12 rounded-full object-cover border border-emerald-500/40"
               />
               <div>
@@ -245,6 +246,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           <img
             src={post.featuredImage.url}
             alt={post.featuredImage.alt}
+            referrerPolicy="no-referrer"
             className="w-full h-80 sm:h-96 object-cover"
           />
           <figcaption className="p-3 bg-slate-950/90 border-t border-slate-800 text-xs text-slate-400 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
@@ -323,6 +325,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                     src={section.image.url}
                     alt={section.image.alt}
                     loading="lazy"
+                    referrerPolicy="no-referrer"
                     className="w-full h-64 sm:h-80 object-cover"
                   />
                   <figcaption className="p-3 bg-slate-950/90 border-t border-slate-800 text-xs text-slate-400 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
