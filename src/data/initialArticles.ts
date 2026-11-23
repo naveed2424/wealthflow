@@ -2,6 +2,7 @@ import { BlogPost } from '../types/blog';
 import { MARKET_SAVING_CRYPTO_ARTICLES } from './marketCryptoSavingArticles';
 import { EXTENDED_ARTICLES_PART_1 } from './extendedArticlesPart1';
 import { EXTENDED_ARTICLES_PART_2 } from './extendedArticlesPart2';
+import { TRENDING_NOVEMBER_ARTICLES } from './trendingNovemberArticles';
 
 export const INITIAL_BLOG_POSTS: BlogPost[] = [
   {
@@ -1512,4 +1513,5 @@ With your daily tracking tool flagging idle cash and over-budget spikes automati
   ...MARKET_SAVING_CRYPTO_ARTICLES,
   ...EXTENDED_ARTICLES_PART_1,
   ...EXTENDED_ARTICLES_PART_2,
+  ...TRENDING_NOVEMBER_ARTICLES,
 ];

@@ -15,7 +15,8 @@ import {
   BookOpen,
   ShieldCheck,
 } from 'lucide-react';
-import naveedPortrait from '../../assets/images/naveed_founder_portrait_1794863632442.jpg';
+
+const NAVEED_OFFICE_PORTRAIT = '/assets/aistudio/Portrait_professionnel_dans_un_bureau_moderne_7ddf5c42.png';
 
 interface StaticPagesProps {
   page: 'about' | 'privacy' | 'terms' | 'disclaimer' | 'contact';
@@ -39,27 +40,27 @@ export const StaticPages: React.FC<StaticPagesProps> = ({ page, onBack }) => {
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#050811] via-slate-950 to-amber-950/20 border border-amber-500/30 p-6 sm:p-8">
             <div className="absolute -top-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-              {/* Polished Portrait */}
-              <div className="md:col-span-4 flex flex-col items-center">
-                <div className="relative w-56 sm:w-64 aspect-[3/4] rounded-2xl overflow-hidden border-2 border-amber-400/60 shadow-2xl shadow-amber-500/20 bg-slate-950">
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Uploaded Studio Office Portrait */}
+              <div className="lg:col-span-5 flex flex-col items-center">
+                <div className="relative w-full aspect-[3/2] rounded-2xl overflow-hidden border-2 border-amber-400/60 shadow-2xl shadow-amber-500/20 bg-slate-950">
                   <img
-                    src={naveedPortrait}
-                    alt="Naveed — Founder & Chief FinTech Strategist at WealthFlow AI"
+                    src={NAVEED_OFFICE_PORTRAIT}
+                    alt="Naveed in modern multi-monitor FinTech engineering office — Founder of WealthFlow AI"
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-cover object-center"
                   />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-3.5">
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent p-3.5">
                     <div className="text-xs font-black text-amber-400 uppercase tracking-wider">
-                      Founder &amp; Publisher
+                      Founder &amp; FinTech Architect
                     </div>
-                    <div className="text-sm font-bold text-white">Naveed</div>
+                    <div className="text-sm font-bold text-white">Naveed — WealthFlow AI Studio</div>
                   </div>
                 </div>
               </div>
 
               {/* Bio & Portfolio Overview */}
-              <div className="md:col-span-8 space-y-4">
+              <div className="lg:col-span-7 space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
                   <Award className="w-3.5 h-3.5 text-amber-400" />
                   About Naveed &amp; WealthFlow AI
@@ -179,10 +180,10 @@ export const StaticPages: React.FC<StaticPagesProps> = ({ page, onBack }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 bg-slate-950/80 rounded-xl border border-amber-500/30 flex items-center gap-3">
                 <img
-                  src={naveedPortrait}
+                  src={NAVEED_OFFICE_PORTRAIT}
                   alt="Naveed — Founder & Editor-in-Chief"
                   referrerPolicy="no-referrer"
-                  className="w-14 h-14 rounded-full object-cover object-top border-2 border-amber-400"
+                  className="w-14 h-14 rounded-full object-cover object-center border-2 border-amber-400"
                 />
                 <div>
                   <h4 className="text-sm font-bold text-white">Naveed</h4>

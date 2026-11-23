@@ -15,13 +15,14 @@ import {
   Lock,
   Flame,
   Zap,
-  Users
+  Users,
+  CreditCard
 } from 'lucide-react';
 import { BLOG_CATEGORIES } from '../data/categories';
 
 interface NavbarProps {
-  currentTab: 'tracker' | 'simulator' | 'blog' | 'daily-tools' | 'static';
-  onSelectTab: (tab: 'tracker' | 'simulator' | 'blog' | 'daily-tools') => void;
+  currentTab: 'tracker' | 'simulator' | 'debt-payoff' | 'blog' | 'daily-tools' | 'static';
+  onSelectTab: (tab: 'tracker' | 'simulator' | 'debt-payoff' | 'blog' | 'daily-tools') => void;
   onOpenAboutUs?: () => void;
   onOpenPublisherPortal: () => void;
   currencySymbol: string;
@@ -80,49 +81,61 @@ export const Navbar: React.FC<NavbarProps> = ({
           <nav className="hidden md:flex items-center gap-1">
             <button
               onClick={() => onSelectTab('daily-tools')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentTab === 'daily-tools'
                   ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40 shadow-md shadow-amber-950/40'
                   : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
               }`}
             >
-              <Flame className="w-4 h-4 text-amber-400" />
+              <Flame className="w-4 h-4 text-amber-400 shrink-0" />
               Daily Expense Audits
             </button>
 
             <button
               onClick={() => onSelectTab('tracker')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentTab === 'tracker'
                   ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
                   : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
               }`}
             >
-              <PieChart className="w-4 h-4 text-amber-400" />
+              <PieChart className="w-4 h-4 text-amber-400 shrink-0" />
               50/30/20 Budget
             </button>
 
             <button
               onClick={() => onSelectTab('simulator')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentTab === 'simulator'
                   ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
                   : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
               }`}
             >
-              <PiggyBank className="w-4 h-4 text-emerald-400" />
+              <PiggyBank className="w-4 h-4 text-emerald-400 shrink-0" />
               Savings Simulator
             </button>
 
             <button
+              onClick={() => onSelectTab('debt-payoff')}
+              className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                currentTab === 'debt-payoff'
+                  ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
+              }`}
+            >
+              <CreditCard className="w-4 h-4 text-amber-400 shrink-0" />
+              Debt Payoff
+            </button>
+
+            <button
               onClick={() => onSelectTab('blog')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentTab === 'blog'
                   ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
                   : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
               }`}
             >
-              <BookOpen className="w-4 h-4 text-amber-400" />
+              <BookOpen className="w-4 h-4 text-amber-400 shrink-0" />
               AI Tools Blog
             </button>
 
@@ -130,11 +143,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="relative">
               <button
                 onClick={() => setCategoriesDropdownOpen(!categoriesDropdownOpen)}
-                className="px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-900/60 transition flex items-center gap-1"
+                className="px-2.5 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-900/60 transition flex items-center gap-1 whitespace-nowrap shrink-0"
               >
-                <Layers className="w-4 h-4 text-amber-400" />
+                <Layers className="w-4 h-4 text-amber-400 shrink-0" />
                 6 Categories
-                <ChevronDown className="w-3.5 h-3.5" />
+                <ChevronDown className="w-3.5 h-3.5 shrink-0" />
               </button>
 
               {categoriesDropdownOpen && (
@@ -169,13 +182,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             {onOpenAboutUs && (
               <button
                 onClick={onOpenAboutUs}
-                className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                   currentTab === 'static'
                     ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
                     : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
                 }`}
               >
-                <Users className="w-4 h-4 text-amber-400" />
+                <Users className="w-4 h-4 text-amber-400 shrink-0" />
                 About Us
               </button>
             )}
@@ -266,6 +279,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               Compound Savings Simulator
+            </button>
+            <button
+              onClick={() => { onSelectTab('debt-payoff'); setMobileMenuOpen(false); }}
+              className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold ${
+                currentTab === 'debt-payoff' ? 'bg-amber-950/60 text-amber-300' : 'text-slate-300'
+              }`}
+            >
+              Debt Payoff Calculator
             </button>
             <button
               onClick={() => { onSelectTab('blog'); setMobileMenuOpen(false); }}

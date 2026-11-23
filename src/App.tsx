@@ -39,6 +39,7 @@ import { GeneratePostModal } from './components/blog/GeneratePostModal';
 import { SEOScorecardModal } from './components/blog/SEOScorecardModal';
 import { BudgetTracker } from './components/tracker/BudgetTracker';
 import { SavingsSimulator } from './components/tracker/SavingsSimulator';
+import { DebtPayoffCalculator } from './components/tracker/DebtPayoffCalculator';
 import { DailyLifeExpenseTools } from './components/tracker/DailyLifeExpenseTools';
 import { AIAdvisorModal } from './components/tracker/AIAdvisorModal';
 import { StaticPages } from './components/pages/StaticPages';
@@ -46,13 +47,6 @@ import { MoneyFlowAnimation } from './components/animation/MoneyFlowAnimation';
 import { BudgetAlertToast } from './components/common/BudgetAlertToast';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'blog' | 'daily-tools' | 'tracker' | 'simulator' | 'static'>('blog');
-  const [staticPage, setStaticPage] = useState<'about' | 'privacy' | 'terms' | 'disclaimer' | 'contact'>('about');
-  const [currencySymbol, setCurrencySymbol] = useState<string>('$');
-  const [adSenseEnabled, setAdSenseEnabled] = useState<boolean>(true);
-  const [showMoneyAnimation, setShowMoneyAnimation] = useState<boolean>(true);
-
-  // Blog posts database with LocalStorage persistence and automatic default sync (newest first)
   const [articles, setArticles] = useState<BlogPost[]>(() => {
     const newestFirstDefaults = [...INITIAL_BLOG_POSTS].reverse();
     const saved = localStorage.getItem('finai_articles');
@@ -73,7 +67,34 @@ export default function App() {
     return newestFirstDefaults;
   });
 
-  const [selectedArticle, setSelectedArticle] = useState<BlogPost | null>(null);
+  const initialParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const initialTabParam = initialParams?.get('tab');
+  const initialArticleSlug = initialParams?.get('article');
+
+  const [activeTab, setActiveTab] = useState<'blog' | 'daily-tools' | 'tracker' | 'simulator' | 'debt-payoff' | 'static'>(() => {
+    if (initialTabParam === 'tracker' || initialTabParam === 'simulator' || initialTabParam === 'debt-payoff' || initialTabParam === 'daily-tools') {
+      return initialTabParam;
+    }
+    if (initialTabParam === 'about' || initialTabParam === 'privacy' || initialTabParam === 'terms' || initialTabParam === 'disclaimer' || initialTabParam === 'contact') {
+      return 'static';
+    }
+    return 'blog';
+  });
+  const [staticPage, setStaticPage] = useState<'about' | 'privacy' | 'terms' | 'disclaimer' | 'contact'>(() => {
+    if (initialTabParam === 'privacy' || initialTabParam === 'terms' || initialTabParam === 'disclaimer' || initialTabParam === 'contact') {
+      return initialTabParam;
+    }
+    return 'about';
+  });
+  const [currencySymbol, setCurrencySymbol] = useState<string>('$');
+  const [adSenseEnabled, setAdSenseEnabled] = useState<boolean>(true);
+  const [showMoneyAnimation, setShowMoneyAnimation] = useState<boolean>(true);
+
+  const [selectedArticle, setSelectedArticle] = useState<BlogPost | null>(() => {
+    if (!initialArticleSlug) return null;
+    const newestFirstDefaults = [...INITIAL_BLOG_POSTS].reverse();
+    return newestFirstDefaults.find(p => p.slug === initialArticleSlug || p.id === initialArticleSlug) || null;
+  });
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -239,6 +260,14 @@ export default function App() {
           </div>
         )}
 
+        {/* TAB 4B: Debt Payoff Calculator (Snowball & Avalanche) */}
+        {activeTab === 'debt-payoff' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            <DebtPayoffCalculator currencySymbol={currencySymbol} />
+            <AdBanner format="leaderboard" enabled={adSenseEnabled} />
+          </div>
+        )}
+
         {/* TAB 5: Blog Portal / Single Article View */}
         {activeTab === 'blog' && (
           <>
@@ -247,13 +276,38 @@ export default function App() {
                 post={selectedArticle}
                 onBack={() => setSelectedArticle(null)}
                 onNavigateInternal={(path) => {
-                  if (path === '/tracker') setActiveTab('tracker');
-                  else if (path === '/savings-simulator') setActiveTab('simulator');
-                  else if (path === '/daily-tools') setActiveTab('daily-tools');
-                  else if (path.includes('/category/')) {
+                  if (path === '/tracker') {
+                    setActiveTab('tracker');
+                    setSelectedArticle(null);
+                  } else if (path === '/savings-simulator') {
+                    setActiveTab('simulator');
+                    setSelectedArticle(null);
+                  } else if (path === '/debt-payoff') {
+                    setActiveTab('debt-payoff');
+                    setSelectedArticle(null);
+                  } else if (path === '/daily-tools') {
+                    setActiveTab('daily-tools');
+                    setSelectedArticle(null);
+                  } else if (path === '/about') {
+                    setStaticPage('about');
+                    setActiveTab('static');
+                    setSelectedArticle(null);
+                  } else if (path === '/contact') {
+                    setStaticPage('contact');
+                    setActiveTab('static');
+                    setSelectedArticle(null);
+                  } else if (path.startsWith('/article/')) {
+                    const slugPart = path.replace('/article/', '');
+                    const matchedPost = articles.find(a => a.slug === slugPart || a.id === slugPart);
+                    if (matchedPost) {
+                      setSelectedArticle(matchedPost);
+                      setActiveTab('blog');
+                    }
+                  } else if (path.includes('/category/')) {
                     const catPart = path.split('/category/')[1];
                     const matched = BLOG_CATEGORIES.find(c => c.slug === catPart);
                     if (matched) setSelectedCategoryFilter(matched.name);
+                    setActiveTab('blog');
                     setSelectedArticle(null);
                   }
                   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -549,12 +603,18 @@ export default function App() {
                       Audit your everyday micro-spending with the Coffee Factor calculator, or test your household cashflow with our interactive 50/30/20 budget ledger.
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex flex-wrap items-center gap-3 shrink-0">
                     <button
                       onClick={() => setActiveTab('daily-tools')}
                       className="px-5 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20"
                     >
                       Audit Daily Life
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('debt-payoff')}
+                      className="px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/30 font-bold text-xs transition"
+                    >
+                      Debt Payoff Calculator
                     </button>
                     <button
                       onClick={() => setActiveTab('tracker')}

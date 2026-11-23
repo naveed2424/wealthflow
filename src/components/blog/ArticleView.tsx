@@ -62,15 +62,34 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
     }
   };
 
+  const siteOrigin = typeof window !== 'undefined' && window.location.origin
+    ? window.location.origin
+    : 'https://ais-dev-jaqzasdnamfwsy27pcee4a-128012116128.europe-west2.run.app';
+  const canonicalArticleUrl = `${siteOrigin}/?article=${encodeURIComponent(post.slug)}`;
+
   const handleShare = () => {
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Article link copied to clipboard!');
+      navigator.clipboard.writeText(canonicalArticleUrl);
+      alert('Canonical article backlink copied to clipboard!');
+    }
+  };
+
+  const handleCopyBacklink = (mode: 'url' | 'html' | 'markdown') => {
+    const snippet =
+      mode === 'url'
+        ? canonicalArticleUrl
+        : mode === 'html'
+        ? `<a href="${canonicalArticleUrl}" rel="noopener">${post.title} — WealthFlow AI</a>`
+        : `[${post.title} — WealthFlow AI](${canonicalArticleUrl})`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(snippet);
+      alert(`${mode.toUpperCase()} backlink copied for redirecting traffic to WealthFlow AI!`);
     }
   };
 
   const handleExportMarkdown = () => {
     let md = `# ${post.title}\n\n`;
+    md += `**Canonical Backlink:** [${post.title}](${canonicalArticleUrl})\n`;
     md += `**Meta Title:** ${post.metaTitle}\n`;
     md += `**Meta Description:** ${post.metaDescription}\n`;
     md += `**Primary Keyword:** ${post.primaryKeyword}\n`;
@@ -101,7 +120,8 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
     });
 
     md += `## Conclusion\n\n${post.conclusion}\n\n`;
-    md += `**Call to Action:** ${post.callToAction}\n`;
+    md += `**Call to Action:** ${post.callToAction}\n\n`;
+    md += `---\n*Originally published on [WealthFlow AI](${siteOrigin}) — Read full interactive calculators & guide: ${canonicalArticleUrl}*\n`;
 
     const blob = new Blob([md], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
@@ -297,6 +317,28 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
               <div className="space-y-3">
                 {section.content.split('\n\n').map((para, pIdx) => {
+                  // Render markdown ### subheadings cleanly
+                  if (para.startsWith('### ')) {
+                    const lines = para.split('\n');
+                    const headingText = lines[0].replace(/^###\s+/, '');
+                    const restLines = lines.slice(1).filter(Boolean);
+                    return (
+                      <div key={pIdx} className="pt-2">
+                        <h3 className="text-base sm:text-lg font-extrabold text-amber-300 mb-2">
+                          {headingText}
+                        </h3>
+                        {restLines.length > 0 && (
+                          <ul className="space-y-2 my-2 pl-4 text-sm sm:text-base text-slate-300 list-disc list-inside">
+                            {restLines.map((line, lIdx) => (
+                              <li key={lIdx} className="leading-relaxed">
+                                {line.replace(/^(-\s+|\d+\.\s+)/, '')}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    );
+                  }
                   // Render bullet lists nicely if paragraph contains bullets
                   if (para.includes('\n- ') || para.startsWith('- ')) {
                     const lines = para.split('\n');
@@ -377,6 +419,38 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                     )}
                   </button>
                 ))}
+              </div>
+
+              {/* Canonical Site Redirect Backlink Widget */}
+              <div className="mt-5 pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                    Canonical Site Redirect Backlink
+                  </div>
+                  <div className="text-[11px] font-mono text-slate-400 truncate">
+                    {canonicalArticleUrl}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={() => handleCopyBacklink('url')}
+                    className="px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-[11px] font-semibold text-slate-200 transition"
+                  >
+                    Copy URL
+                  </button>
+                  <button
+                    onClick={() => handleCopyBacklink('html')}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-[11px] font-bold text-amber-300 transition"
+                  >
+                    HTML Backlink
+                  </button>
+                  <button
+                    onClick={() => handleCopyBacklink('markdown')}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-[11px] font-bold text-emerald-300 transition"
+                  >
+                    MD Backlink
+                  </button>
+                </div>
               </div>
             </div>
           )}
