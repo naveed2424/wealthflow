@@ -40,6 +40,7 @@ import { SEOScorecardModal } from './components/blog/SEOScorecardModal';
 import { BudgetTracker } from './components/tracker/BudgetTracker';
 import { SavingsSimulator } from './components/tracker/SavingsSimulator';
 import { DebtPayoffCalculator } from './components/tracker/DebtPayoffCalculator';
+import { SavingsGoals } from './components/tracker/SavingsGoals';
 import { DailyLifeExpenseTools } from './components/tracker/DailyLifeExpenseTools';
 import { AIAdvisorModal } from './components/tracker/AIAdvisorModal';
 import { StaticPages } from './components/pages/StaticPages';
@@ -71,8 +72,14 @@ export default function App() {
   const initialTabParam = initialParams?.get('tab');
   const initialArticleSlug = initialParams?.get('article');
 
-  const [activeTab, setActiveTab] = useState<'blog' | 'daily-tools' | 'tracker' | 'simulator' | 'debt-payoff' | 'static'>(() => {
-    if (initialTabParam === 'tracker' || initialTabParam === 'simulator' || initialTabParam === 'debt-payoff' || initialTabParam === 'daily-tools') {
+  const [activeTab, setActiveTab] = useState<'blog' | 'daily-tools' | 'tracker' | 'simulator' | 'savings-goals' | 'debt-payoff' | 'static'>(() => {
+    if (
+      initialTabParam === 'tracker' ||
+      initialTabParam === 'simulator' ||
+      initialTabParam === 'savings-goals' ||
+      initialTabParam === 'debt-payoff' ||
+      initialTabParam === 'daily-tools'
+    ) {
       return initialTabParam;
     }
     if (initialTabParam === 'about' || initialTabParam === 'privacy' || initialTabParam === 'terms' || initialTabParam === 'disclaimer' || initialTabParam === 'contact') {
@@ -268,6 +275,14 @@ export default function App() {
           </div>
         )}
 
+        {/* TAB 4C: Savings Goals & Deadline Milestones */}
+        {activeTab === 'savings-goals' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            <SavingsGoals currencySymbol={currencySymbol} />
+            <AdBanner format="leaderboard" enabled={adSenseEnabled} />
+          </div>
+        )}
+
         {/* TAB 5: Blog Portal / Single Article View */}
         {activeTab === 'blog' && (
           <>
@@ -281,6 +296,9 @@ export default function App() {
                     setSelectedArticle(null);
                   } else if (path === '/savings-simulator') {
                     setActiveTab('simulator');
+                    setSelectedArticle(null);
+                  } else if (path === '/savings-goals') {
+                    setActiveTab('savings-goals');
                     setSelectedArticle(null);
                   } else if (path === '/debt-payoff') {
                     setActiveTab('debt-payoff');
@@ -609,6 +627,12 @@ export default function App() {
                       className="px-5 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20"
                     >
                       Audit Daily Life
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('savings-goals')}
+                      className="px-5 py-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs transition"
+                    >
+                      Savings Goals
                     </button>
                     <button
                       onClick={() => setActiveTab('debt-payoff')}

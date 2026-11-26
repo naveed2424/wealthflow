@@ -5,7 +5,7 @@ import { BLOG_CATEGORIES } from '../data/categories';
 interface FooterProps {
   onSelectCategory: (name: string) => void;
   onOpenStaticPage: (page: 'about' | 'privacy' | 'terms' | 'disclaimer' | 'contact') => void;
-  onNavigateToTab: (tab: 'tracker' | 'simulator' | 'debt-payoff' | 'blog' | 'daily-tools') => void;
+  onNavigateToTab: (tab: 'tracker' | 'simulator' | 'savings-goals' | 'debt-payoff' | 'blog' | 'daily-tools') => void;
   onOpenPublisherPortal: () => void;
 }
 
@@ -104,6 +104,11 @@ export const Footer: React.FC<FooterProps> = ({
               <li>
                 <button onClick={() => onNavigateToTab('simulator')} className="hover:text-amber-400 transition text-left">
                   Compound Interest Simulator
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigateToTab('savings-goals')} className="hover:text-emerald-400 transition text-left">
+                  Savings Goals &amp; Deadlines
                 </button>
               </li>
               <li>

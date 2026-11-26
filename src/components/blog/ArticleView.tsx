@@ -67,6 +67,72 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
     : 'https://ais-dev-jaqzasdnamfwsy27pcee4a-128012116128.europe-west2.run.app';
   const canonicalArticleUrl = `${siteOrigin}/?article=${encodeURIComponent(post.slug)}`;
 
+  const renderInlineFormatting = (text: string): React.ReactNode => {
+    const tokenRegex = /(\[[^\]]+\]\(https?:\/\/[^\s)]+\)|\*\*[^*]+\*\*)/g;
+    const parts = text.split(tokenRegex);
+    return parts.map((part, idx) => {
+      const linkMatch = part.match(/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/);
+      if (linkMatch) {
+        const [, label, href] = linkMatch;
+        const isSelfDomain =
+          href.includes('ais-dev-jaqzasdnamfwsy27pcee4a-128012116128.europe-west2.run.app') ||
+          href.includes('ais-pre-jaqzasdnamfwsy27pcee4a-128012116128.europe-west2.run.app') ||
+          href.startsWith(siteOrigin);
+        return (
+          <a
+            key={idx}
+            href={href}
+            onClick={(e) => {
+              if (!isSelfDomain) return;
+              try {
+                const parsed = new URL(href);
+                const tabParam = parsed.searchParams.get('tab');
+                const articleParam = parsed.searchParams.get('article');
+                if (articleParam) {
+                  e.preventDefault();
+                  onNavigateInternal(`/article/${articleParam}`);
+                } else if (tabParam === 'tracker') {
+                  e.preventDefault();
+                  onNavigateInternal('/tracker');
+                } else if (tabParam === 'simulator') {
+                  e.preventDefault();
+                  onNavigateInternal('/savings-simulator');
+                } else if (tabParam === 'savings-goals') {
+                  e.preventDefault();
+                  onNavigateInternal('/savings-goals');
+                } else if (tabParam === 'debt-payoff') {
+                  e.preventDefault();
+                  onNavigateInternal('/debt-payoff');
+                } else if (tabParam === 'daily-tools') {
+                  e.preventDefault();
+                  onNavigateInternal('/daily-tools');
+                } else if (tabParam === 'about') {
+                  e.preventDefault();
+                  onNavigateInternal('/about');
+                }
+              } catch {
+                // fallback to native link navigation
+              }
+            }}
+            target={isSelfDomain ? undefined : '_blank'}
+            rel={isSelfDomain ? 'noopener' : 'noopener noreferrer'}
+            className="text-emerald-400 hover:text-emerald-300 underline decoration-emerald-500/50 underline-offset-2 font-semibold transition"
+          >
+            {label}
+          </a>
+        );
+      }
+      if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+        return (
+          <strong key={idx} className="text-white font-bold">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return <React.Fragment key={idx}>{part}</React.Fragment>;
+    });
+  };
+
   const handleShare = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(canonicalArticleUrl);
@@ -287,7 +353,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             {post.keyTakeaways.map((takeaway, i) => (
               <li key={i} className="flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="leading-relaxed">{takeaway}</span>
+                <span className="leading-relaxed">{renderInlineFormatting(takeaway)}</span>
               </li>
             ))}
           </ul>
@@ -299,7 +365,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           <div className="space-y-4">
             {post.introduction.split('\n\n').map((paragraph, i) => (
               <p key={i} className="text-slate-300 leading-relaxed text-base sm:text-lg">
-                {paragraph}
+                {renderInlineFormatting(paragraph)}
               </p>
             ))}
           </div>
@@ -331,7 +397,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                           <ul className="space-y-2 my-2 pl-4 text-sm sm:text-base text-slate-300 list-disc list-inside">
                             {restLines.map((line, lIdx) => (
                               <li key={lIdx} className="leading-relaxed">
-                                {line.replace(/^(-\s+|\d+\.\s+)/, '')}
+                                {renderInlineFormatting(line.replace(/^(-\s+|\d+\.\s+)/, ''))}
                               </li>
                             ))}
                           </ul>
@@ -346,7 +412,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                       <ul key={pIdx} className="space-y-2 my-4 pl-4 text-sm sm:text-base text-slate-300 list-disc list-inside">
                         {lines.map((line, lIdx) => (
                           <li key={lIdx} className="leading-relaxed">
-                            {line.replace(/^- /, '')}
+                            {renderInlineFormatting(line.replace(/^- /, ''))}
                           </li>
                         ))}
                       </ul>
@@ -354,7 +420,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   }
                   return (
                     <p key={pIdx} className="text-slate-300 leading-relaxed text-sm sm:text-base">
-                      {para}
+                      {renderInlineFormatting(para)}
                     </p>
                   );
                 })}
@@ -389,7 +455,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                 Real-World Impact on Household Wealth
               </h3>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                {post.realWorldImpact}
+                {renderInlineFormatting(post.realWorldImpact)}
               </p>
             </div>
           )}
@@ -514,7 +580,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                     </button>
                     {isOpen && (
                       <div className="px-4 pb-4 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-slate-800/60 pt-3 animate-in fade-in duration-200">
-                        {f.answer}
+                        {renderInlineFormatting(f.answer)}
                       </div>
                     )}
                   </div>
@@ -527,14 +593,14 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           <div className="p-8 rounded-3xl bg-gradient-to-r from-emerald-950/60 via-slate-900 to-amber-950/40 border border-emerald-500/30 my-10">
             <h3 className="text-xl font-black text-white mb-3">Conclusion & Future Outlook</h3>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-6">
-              {post.conclusion}
+              {renderInlineFormatting(post.conclusion)}
             </p>
             <div className="p-4 rounded-2xl bg-emerald-950/50 border border-emerald-500/30">
               <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">
                 Your Next Action Step
               </h4>
               <p className="text-xs sm:text-sm text-white font-medium mb-3">
-                {post.callToAction}
+                {renderInlineFormatting(post.callToAction)}
               </p>
               <button
                 onClick={() => onNavigateInternal('/tracker')}

@@ -16,13 +16,14 @@ import {
   Flame,
   Zap,
   Users,
-  CreditCard
+  CreditCard,
+  Target
 } from 'lucide-react';
 import { BLOG_CATEGORIES } from '../data/categories';
 
 interface NavbarProps {
-  currentTab: 'tracker' | 'simulator' | 'debt-payoff' | 'blog' | 'daily-tools' | 'static';
-  onSelectTab: (tab: 'tracker' | 'simulator' | 'debt-payoff' | 'blog' | 'daily-tools') => void;
+  currentTab: 'tracker' | 'simulator' | 'savings-goals' | 'debt-payoff' | 'blog' | 'daily-tools' | 'static';
+  onSelectTab: (tab: 'tracker' | 'simulator' | 'savings-goals' | 'debt-payoff' | 'blog' | 'daily-tools') => void;
   onOpenAboutUs?: () => void;
   onOpenPublisherPortal: () => void;
   currencySymbol: string;
@@ -81,19 +82,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           <nav className="hidden md:flex items-center gap-1">
             <button
               onClick={() => onSelectTab('daily-tools')}
-              className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              className={`px-2 py-1.5 xl:px-2.5 xl:py-2 rounded-xl text-[11px] xl:text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentTab === 'daily-tools'
                   ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40 shadow-md shadow-amber-950/40'
                   : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
               }`}
             >
               <Flame className="w-4 h-4 text-amber-400 shrink-0" />
-              Daily Expense Audits
+              Daily Audits
             </button>
 
             <button
               onClick={() => onSelectTab('tracker')}
-              className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              className={`px-2 py-1.5 xl:px-2.5 xl:py-2 rounded-xl text-[11px] xl:text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentTab === 'tracker'
                   ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
                   : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
@@ -104,20 +105,32 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             <button
+              onClick={() => onSelectTab('savings-goals')}
+              className={`px-2 py-1.5 xl:px-2.5 xl:py-2 rounded-xl text-[11px] xl:text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                currentTab === 'savings-goals'
+                  ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/40'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
+              }`}
+            >
+              <Target className="w-4 h-4 text-emerald-400 shrink-0" />
+              Savings Goals
+            </button>
+
+            <button
               onClick={() => onSelectTab('simulator')}
-              className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              className={`px-2 py-1.5 xl:px-2.5 xl:py-2 rounded-xl text-[11px] xl:text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentTab === 'simulator'
                   ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
                   : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
               }`}
             >
               <PiggyBank className="w-4 h-4 text-emerald-400 shrink-0" />
-              Savings Simulator
+              Simulator
             </button>
 
             <button
               onClick={() => onSelectTab('debt-payoff')}
-              className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              className={`px-2 py-1.5 xl:px-2.5 xl:py-2 rounded-xl text-[11px] xl:text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentTab === 'debt-payoff'
                   ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
                   : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
@@ -129,14 +142,14 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => onSelectTab('blog')}
-              className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              className={`px-2 py-1.5 xl:px-2.5 xl:py-2 rounded-xl text-[11px] xl:text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 currentTab === 'blog'
                   ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
                   : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
               }`}
             >
               <BookOpen className="w-4 h-4 text-amber-400 shrink-0" />
-              AI Tools Blog
+              Blog
             </button>
 
             {/* 6 Categories Dropdown */}
@@ -271,6 +284,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               Budget Tracker (50/30/20)
+            </button>
+            <button
+              onClick={() => { onSelectTab('savings-goals'); setMobileMenuOpen(false); }}
+              className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold ${
+                currentTab === 'savings-goals' ? 'bg-emerald-950/60 text-emerald-300' : 'text-slate-300'
+              }`}
+            >
+              Savings Goals &amp; Deadlines
             </button>
             <button
               onClick={() => { onSelectTab('simulator'); setMobileMenuOpen(false); }}
