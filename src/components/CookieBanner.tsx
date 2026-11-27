@@ -11,9 +11,15 @@ export const CookieBanner: React.FC<CookieBannerProps> = ({ onNavigateToPrivacy 
   useEffect(() => {
     const consent = localStorage.getItem('finai_cookie_consent');
     if (!consent) {
-      const timer = setTimeout(() => setIsOpen(true), 1200);
+      const timer = setTimeout(() => setIsOpen(true), 800);
       return () => clearTimeout(timer);
     }
+  }, []);
+
+  useEffect(() => {
+    const handleOpenSettings = () => setIsOpen(true);
+    window.addEventListener('wealthflow-open-cookie-settings', handleOpenSettings);
+    return () => window.removeEventListener('wealthflow-open-cookie-settings', handleOpenSettings);
   }, []);
 
   const handleAccept = () => {
@@ -29,7 +35,11 @@ export const CookieBanner: React.FC<CookieBannerProps> = ({ onNavigateToPrivacy 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-50 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl p-4 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div
+      role="dialog"
+      aria-label="Cookie and privacy consent"
+      className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-50 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl p-4 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300"
+    >
       <div className="flex items-start gap-3">
         <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
           <Cookie className="w-5 h-5" />
@@ -37,12 +47,12 @@ export const CookieBanner: React.FC<CookieBannerProps> = ({ onNavigateToPrivacy 
         <div>
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            Cookie & AdSense Consent
+            Privacy &amp; Cookie Choices
           </div>
           <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-            We use essential cookies and personalized advertising cookies to provide budgeting tools and support high-quality financial journalism.
+            WealthFlow AI uses essential browser storage for your calculators and, if consented, third-party advertising cookies (including Google AdSense) to keep our personal finance tools free.
           </p>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               onClick={handleAccept}
               className="text-xs font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 px-3.5 py-1.5 rounded-lg transition"
@@ -51,13 +61,16 @@ export const CookieBanner: React.FC<CookieBannerProps> = ({ onNavigateToPrivacy 
             </button>
             <button
               onClick={handleDecline}
-              className="text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition"
+              className="text-xs font-medium text-slate-200 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg transition"
             >
-              Essential Only
+              Reject Non-Essential
             </button>
             {onNavigateToPrivacy && (
               <button
-                onClick={onNavigateToPrivacy}
+                onClick={() => {
+                  onNavigateToPrivacy();
+                  setIsOpen(false);
+                }}
                 className="text-xs text-slate-400 hover:text-emerald-400 underline underline-offset-2 ml-auto"
               >
                 Privacy Policy

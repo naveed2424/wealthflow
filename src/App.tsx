@@ -111,6 +111,7 @@ export default function App() {
   const [aiAdvisorInsight, setAiAdvisorInsight] = useState<AIAdvisorInsight | null>(null);
   const [isAdvisorLoading, setIsAdvisorLoading] = useState(false);
   const [isAdvisorModalOpen, setIsAdvisorModalOpen] = useState(false);
+  const [advisorError, setAdvisorError] = useState<string | null>(null);
 
   // Global transactions state for app-wide budget breach alerts
   const [globalTransactions, setGlobalTransactions] = useState<Transaction[]>(() => {
@@ -129,9 +130,52 @@ export default function App() {
     setActiveTab('blog');
   };
 
+  // Helper to navigate from internal paths or tool spotlights
+  const navigateInternalPath = (path: string) => {
+    if (path === '/tracker') {
+      setActiveTab('tracker');
+      setSelectedArticle(null);
+    } else if (path === '/savings-simulator') {
+      setActiveTab('simulator');
+      setSelectedArticle(null);
+    } else if (path === '/savings-goals') {
+      setActiveTab('savings-goals');
+      setSelectedArticle(null);
+    } else if (path === '/debt-payoff') {
+      setActiveTab('debt-payoff');
+      setSelectedArticle(null);
+    } else if (path === '/daily-tools') {
+      setActiveTab('daily-tools');
+      setSelectedArticle(null);
+    } else if (path === '/about') {
+      setStaticPage('about');
+      setActiveTab('static');
+      setSelectedArticle(null);
+    } else if (path === '/contact') {
+      setStaticPage('contact');
+      setActiveTab('static');
+      setSelectedArticle(null);
+    } else if (path.startsWith('/article/')) {
+      const slugPart = path.replace('/article/', '');
+      const matchedPost = articles.find(a => a.slug === slugPart || a.id === slugPart);
+      if (matchedPost) {
+        setSelectedArticle(matchedPost);
+        setActiveTab('blog');
+      }
+    } else if (path.includes('/category/')) {
+      const catPart = path.split('/category/')[1];
+      const matched = BLOG_CATEGORIES.find(c => c.slug === catPart);
+      if (matched) setSelectedCategoryFilter(matched.name);
+      setActiveTab('blog');
+      setSelectedArticle(null);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // AI Spending audit trigger
   const handleTriggerAIAdvisor = async (data: { income: number; expenses: Transaction[]; savingsGoal: number }) => {
     setIsAdvisorLoading(true);
+    setAdvisorError(null);
     try {
       const res = await fetch('/api/analyze-spending', {
         method: 'POST',
@@ -148,11 +192,11 @@ export default function App() {
         setAiAdvisorInsight(result.analysis);
         setIsAdvisorModalOpen(true);
       } else {
-        alert(result.error || 'Failed to analyze spending');
+        setAdvisorError(result.error || 'Failed to analyze spending. Please try again.');
       }
     } catch (err: any) {
       console.error(err);
-      alert('Could not connect to AI Financial Advisor backend. Please try again.');
+      setAdvisorError('Could not connect to the Spending Advisor service. Please try again.');
     } finally {
       setIsAdvisorLoading(false);
     }
@@ -218,7 +262,17 @@ export default function App() {
       )}
 
       <main className="flex-1">
-        {/* TAB 1: Static AdSense Compliance Pages */}
+        {advisorError && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+            <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-200 text-xs flex items-center justify-between gap-3">
+              <span>{advisorError}</span>
+              <button onClick={() => setAdvisorError(null)} className="text-rose-300 hover:text-white font-bold">
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
+        {/* TAB 1: Static Trust & Policy Pages */}
         {activeTab === 'static' && (
           <StaticPages
             page={staticPage}
@@ -226,23 +280,18 @@ export default function App() {
           />
         )}
 
-        {/* TAB 2: Daily Life Expense Audits (NEW) */}
+        {/* TAB 2: Daily Life Expense Audits */}
         {activeTab === 'daily-tools' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-            {/* Interactive Golden Money Flow Architectural Canvas */}
             <MoneyFlowAnimation currencySymbol={currencySymbol} />
-
-            {/* Daily Expense Suite */}
             <DailyLifeExpenseTools currencySymbol={currencySymbol} />
-
-            <AdBanner format="leaderboard" enabled={adSenseEnabled} />
+            <AdBanner format="leaderboard" enabled={adSenseEnabled} onNavigate={navigateInternalPath} />
           </div>
         )}
 
         {/* TAB 3: Budget Tracker (50/30/20) */}
         {activeTab === 'tracker' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-            {/* Optional Money Flow Animation */}
             {showMoneyAnimation && (
               <div className="mb-4">
                 <MoneyFlowAnimation currencySymbol={currencySymbol} />
@@ -255,7 +304,7 @@ export default function App() {
               isAdvisorLoading={isAdvisorLoading}
               advisorResult={aiAdvisorInsight}
             />
-            <AdBanner format="leaderboard" enabled={adSenseEnabled} />
+            <AdBanner format="leaderboard" enabled={adSenseEnabled} onNavigate={navigateInternalPath} />
           </div>
         )}
 
@@ -263,7 +312,7 @@ export default function App() {
         {activeTab === 'simulator' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
             <SavingsSimulator currencySymbol={currencySymbol} />
-            <AdBanner format="leaderboard" enabled={adSenseEnabled} />
+            <AdBanner format="leaderboard" enabled={adSenseEnabled} onNavigate={navigateInternalPath} />
           </div>
         )}
 
@@ -271,7 +320,7 @@ export default function App() {
         {activeTab === 'debt-payoff' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
             <DebtPayoffCalculator currencySymbol={currencySymbol} />
-            <AdBanner format="leaderboard" enabled={adSenseEnabled} />
+            <AdBanner format="leaderboard" enabled={adSenseEnabled} onNavigate={navigateInternalPath} />
           </div>
         )}
 
@@ -279,7 +328,7 @@ export default function App() {
         {activeTab === 'savings-goals' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
             <SavingsGoals currencySymbol={currencySymbol} />
-            <AdBanner format="leaderboard" enabled={adSenseEnabled} />
+            <AdBanner format="leaderboard" enabled={adSenseEnabled} onNavigate={navigateInternalPath} />
           </div>
         )}
 
@@ -290,46 +339,7 @@ export default function App() {
               <ArticleView
                 post={selectedArticle}
                 onBack={() => setSelectedArticle(null)}
-                onNavigateInternal={(path) => {
-                  if (path === '/tracker') {
-                    setActiveTab('tracker');
-                    setSelectedArticle(null);
-                  } else if (path === '/savings-simulator') {
-                    setActiveTab('simulator');
-                    setSelectedArticle(null);
-                  } else if (path === '/savings-goals') {
-                    setActiveTab('savings-goals');
-                    setSelectedArticle(null);
-                  } else if (path === '/debt-payoff') {
-                    setActiveTab('debt-payoff');
-                    setSelectedArticle(null);
-                  } else if (path === '/daily-tools') {
-                    setActiveTab('daily-tools');
-                    setSelectedArticle(null);
-                  } else if (path === '/about') {
-                    setStaticPage('about');
-                    setActiveTab('static');
-                    setSelectedArticle(null);
-                  } else if (path === '/contact') {
-                    setStaticPage('contact');
-                    setActiveTab('static');
-                    setSelectedArticle(null);
-                  } else if (path.startsWith('/article/')) {
-                    const slugPart = path.replace('/article/', '');
-                    const matchedPost = articles.find(a => a.slug === slugPart || a.id === slugPart);
-                    if (matchedPost) {
-                      setSelectedArticle(matchedPost);
-                      setActiveTab('blog');
-                    }
-                  } else if (path.includes('/category/')) {
-                    const catPart = path.split('/category/')[1];
-                    const matched = BLOG_CATEGORIES.find(c => c.slug === catPart);
-                    if (matched) setSelectedCategoryFilter(matched.name);
-                    setActiveTab('blog');
-                    setSelectedArticle(null);
-                  }
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+                onNavigateInternal={navigateInternalPath}
                 onOpenSEOScorecard={(post) => setSeoScorecardArticle(post)}
                 adSenseEnabled={adSenseEnabled}
               />
@@ -373,7 +383,7 @@ export default function App() {
                         <div className="flex flex-wrap items-center gap-2 mb-3">
                           <span className="text-xs font-black px-3 py-1 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-sm flex items-center gap-1">
                             <Award className="w-3.5 h-3.5" />
-                            Lead Investigation • 2,000+ Words
+                            Lead Analysis
                           </span>
                           <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-950 text-amber-300 border border-amber-500/30">
                             {featuredArticle.category}
@@ -438,12 +448,12 @@ export default function App() {
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                         <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                        Trending In-Depth Guides (2,000+ Words)
+                        Trending Personal Finance Guides
                       </span>
-                      <span className="text-[11px] text-slate-400 font-mono">Fact-Checked</span>
+                      <span className="text-[11px] text-slate-400 font-mono">Editorial Desk</span>
                     </div>
 
-                    {regularArticles.slice(0, 2).map((post, pIdx) => (
+                    {regularArticles.slice(0, 2).map((post) => (
                       <div
                         key={post.id}
                         onClick={() => setSelectedArticle(post)}
@@ -460,7 +470,7 @@ export default function App() {
                               {post.readTime}
                             </span>
                             <span className="ml-auto text-[10px] font-mono text-emerald-400 font-bold">
-                              SEO 98/100
+                              Research Guide
                             </span>
                           </div>
 
@@ -498,8 +508,8 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* AdSense Top Leaderboard */}
-                <AdBanner format="leaderboard" enabled={adSenseEnabled} />
+                {/* Tool Spotlight Banner */}
+                <AdBanner format="leaderboard" enabled={adSenseEnabled} onNavigate={navigateInternalPath} />
 
                 {/* 6 Official Category Pills */}
                 <div>
@@ -562,12 +572,12 @@ export default function App() {
 
                   <div className="flex items-center gap-4 text-xs text-slate-400">
                     <span>
-                      Showing <strong className="text-white">{filteredArticles.length}</strong> verified articles
+                      Showing <strong className="text-white">{filteredArticles.length}</strong> published guides
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1 text-amber-400">
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      100% Fact-Checked
+                      Source-Cited Research
                     </span>
                   </div>
                 </div>
@@ -577,7 +587,7 @@ export default function App() {
                   <div>
                     <div className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                       <Award className="w-4 h-4" />
-                      Featured In-Depth Investigation (2,000+ Words)
+                      Featured In-Depth Guide
                     </div>
                     <BlogCard
                       post={featuredArticle}
@@ -591,7 +601,7 @@ export default function App() {
                 {regularArticles.length > 0 && (
                   <div>
                     <h3 className="text-lg font-black text-white mb-6">
-                      Latest Published Articles & Field Tests
+                      Latest Published Articles &amp; Guides
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {regularArticles.map(post => (
@@ -605,8 +615,8 @@ export default function App() {
                   </div>
                 )}
 
-                {/* In-feed AdSense slot */}
-                <AdBanner format="in-article" enabled={adSenseEnabled} />
+                {/* In-feed Resource Spotlight */}
+                <AdBanner format="in-article" enabled={adSenseEnabled} onNavigate={navigateInternalPath} />
 
                 {/* Interactive Tools Teaser Card */}
                 <div className="p-8 rounded-3xl bg-gradient-to-r from-slate-950 via-[#050811] to-slate-950 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-6">

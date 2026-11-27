@@ -1,5 +1,5 @@
-import React from 'react';
-import { TrendingUp, ShieldCheck, Mail, Heart, Sparkles, Lock, Flame } from 'lucide-react';
+import React, { useState } from 'react';
+import { TrendingUp, ShieldCheck, Sparkles, Lock, Flame, CheckCircle2 } from 'lucide-react';
 import { BLOG_CATEGORIES } from '../data/categories';
 
 interface FooterProps {
@@ -15,6 +15,8 @@ export const Footer: React.FC<FooterProps> = ({
   onNavigateToTab,
   onOpenPublisherPortal,
 }) => {
+  const [subscribed, setSubscribed] = useState(false);
+
   return (
     <footer className="bg-[#020408] border-t border-amber-500/20 mt-20 text-slate-400 text-xs">
       {/* Newsletter Bar */}
@@ -25,26 +27,33 @@ export const Footer: React.FC<FooterProps> = ({
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               WealthFlow Intelligence Dispatch
             </span>
-            <h3 className="text-xl font-bold text-white mt-1">Get Tomorrow's Money AI Tools in Your Inbox</h3>
-            <p className="text-slate-400 text-xs mt-1">Join 38,000+ savers, investors, and technologists staying ahead of automated finance.</p>
+            <h3 className="text-xl font-bold text-white mt-1">Get Personal Finance &amp; Smart Money Research Updates</h3>
+            <p className="text-slate-400 text-xs mt-1">Weekly guides on 50/30/20 budgeting, automated savings, debt elimination, and macro literacy.</p>
           </div>
-          <form
-            onSubmit={e => { e.preventDefault(); alert('Subscribed! Welcome to WealthFlow AI Dispatch.'); }}
-            className="flex items-center gap-2 w-full md:w-auto"
-          >
-            <input
-              type="email"
-              required
-              placeholder="Enter your email..."
-              className="px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-500 w-full md:w-64"
-            />
-            <button
-              type="submit"
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs shrink-0 transition shadow-lg shadow-amber-500/20"
+          {subscribed ? (
+            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 font-bold text-xs">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              Subscribed! Watch your inbox for WealthFlow AI updates.
+            </div>
+          ) : (
+            <form
+              onSubmit={e => { e.preventDefault(); setSubscribed(true); }}
+              className="flex items-center gap-2 w-full md:w-auto"
             >
-              Subscribe Free
-            </button>
-          </form>
+              <input
+                type="email"
+                required
+                placeholder="Enter your email..."
+                className="px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-500 w-full md:w-64"
+              />
+              <button
+                type="submit"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs shrink-0 transition shadow-lg shadow-amber-500/20"
+              >
+                Subscribe Free
+              </button>
+            </form>
+          )}
         </div>
       </div>
 
@@ -65,7 +74,7 @@ export const Footer: React.FC<FooterProps> = ({
             </p>
             <div className="flex items-center gap-2 text-[11px] text-amber-400/90 font-mono">
               <ShieldCheck className="w-4 h-4 text-amber-400" />
-              GDPR & AdSense Compliant Portal
+              Independent Financial Education
             </div>
           </div>
 
@@ -129,18 +138,26 @@ export const Footer: React.FC<FooterProps> = ({
             </ul>
           </div>
 
-          {/* AdSense Mandatory Compliance Links & Owner Desk */}
+          {/* Editorial & Trust Center */}
           <div>
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">AdSense & Trust Center</h4>
+            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">Editorial &amp; Trust Center</h4>
             <ul className="space-y-2">
               <li>
                 <button onClick={() => onOpenStaticPage('about')} className="hover:text-amber-400 transition text-left">
-                  About Us & Editorial Standards
+                  About Us &amp; Editorial Standards
                 </button>
               </li>
               <li>
                 <button onClick={() => onOpenStaticPage('privacy')} className="hover:text-amber-400 transition text-left">
-                  Privacy Policy & Cookies
+                  Privacy Policy &amp; Cookies
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => window.dispatchEvent(new Event('wealthflow-open-cookie-settings'))}
+                  className="hover:text-emerald-400 transition text-left"
+                >
+                  Cookie Preferences
                 </button>
               </li>
               <li>
@@ -150,12 +167,12 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <button onClick={() => onOpenStaticPage('disclaimer')} className="hover:text-amber-400 transition text-left">
-                  Financial & Affiliate Disclaimer
+                  Financial &amp; Editorial Disclaimer
                 </button>
               </li>
               <li>
                 <button onClick={() => onOpenStaticPage('contact')} className="hover:text-amber-400 transition text-left">
-                  Contact & Editorial Desk
+                  Contact &amp; Editorial Desk
                 </button>
               </li>
               <li className="pt-2">
@@ -178,10 +195,10 @@ export const Footer: React.FC<FooterProps> = ({
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2">
             <div>
-              © 2026 WealthFlow AI – Daily Expense Tracker & Smart Money Tools. All rights reserved.
+              © 2026 WealthFlow AI – Daily Expense Tracker &amp; Smart Money Tools. Contact: <a href="mailto:Afzal460@gmail.com" className="text-slate-400 hover:text-emerald-400 underline">Afzal460@gmail.com</a>
             </div>
-            <div className="flex items-center gap-1 text-amber-400/70 font-mono">
-              High SEO Score & AdSense Verified
+            <div className="flex items-center gap-1 text-slate-400 font-mono">
+              Editorial Standards &amp; Privacy First
             </div>
           </div>
         </div>

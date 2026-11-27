@@ -58,7 +58,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post, onSelect, featured = f
               {(post.views || 2400).toLocaleString()}
             </span>
             <span className="ml-auto text-[10px] font-bold text-amber-400 bg-amber-950/60 border border-amber-500/20 px-2 py-0.5 rounded">
-              SEO 98/100
+              Research Guide
             </span>
           </div>
 

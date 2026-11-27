@@ -1,5 +1,7 @@
 import express from 'express';
+import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Type } from '@google/genai';
@@ -7,8 +9,12 @@ import { REGISTERED_SEO_PROMPT } from './src/data/registeredSeoPrompt';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const SITE_ORIGIN = 'https://ais-dev-jaqzasdnamfwsy27pcee4a-128012116128.europe-west2.run.app';
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -18,6 +24,55 @@ app.get('/api/health', (_req, res) => {
 
 app.get('/api/seo-prompt', (_req, res) => {
   res.json({ success: true, registeredPrompt: REGISTERED_SEO_PROMPT });
+});
+
+app.get('/sitemap.xml', (_req, res) => {
+  const staticUrls = [
+    { loc: `${SITE_ORIGIN}/`, freq: 'daily', priority: '1.0' },
+    { loc: `${SITE_ORIGIN}/?tab=daily-tools`, freq: 'weekly', priority: '0.9' },
+    { loc: `${SITE_ORIGIN}/?tab=tracker`, freq: 'weekly', priority: '0.9' },
+    { loc: `${SITE_ORIGIN}/?tab=savings-goals`, freq: 'weekly', priority: '0.9' },
+    { loc: `${SITE_ORIGIN}/?tab=simulator`, freq: 'weekly', priority: '0.9' },
+    { loc: `${SITE_ORIGIN}/?tab=debt-payoff`, freq: 'weekly', priority: '0.9' },
+    { loc: `${SITE_ORIGIN}/?tab=about`, freq: 'monthly', priority: '0.7' },
+    { loc: `${SITE_ORIGIN}/?tab=privacy`, freq: 'monthly', priority: '0.6' },
+    { loc: `${SITE_ORIGIN}/?tab=terms`, freq: 'monthly', priority: '0.6' },
+    { loc: `${SITE_ORIGIN}/?tab=disclaimer`, freq: 'monthly', priority: '0.6' },
+    { loc: `${SITE_ORIGIN}/?tab=contact`, freq: 'monthly', priority: '0.7' },
+  ];
+
+  const dataDir = path.resolve(__dirname, 'src', 'data');
+  const slugSet = new Set<string>();
+  try {
+    for (const fileName of fs.readdirSync(dataDir)) {
+      if (!fileName.endsWith('.ts')) continue;
+      const content = fs.readFileSync(path.join(dataDir, fileName), 'utf8');
+      for (const match of content.matchAll(/slug:\s*'([^']+)'/g)) {
+        slugSet.add(match[1]);
+      }
+    }
+  } catch {
+    // keep static URLs if directory scan unavailable
+  }
+
+  const articleEntries = [...slugSet].map(slug => ({
+    loc: `${SITE_ORIGIN}/?article=${encodeURIComponent(slug)}`,
+    freq: 'weekly',
+    priority: '0.8',
+  }));
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[
+    ...staticUrls,
+    ...articleEntries,
+  ]
+    .map(
+      u =>
+        `  <url>\n    <loc>${u.loc}</loc>\n    <changefreq>${u.freq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`
+    )
+    .join('\n')}\n</urlset>`;
+
+  res.header('Content-Type', 'application/xml');
+  res.send(xml);
 });
 
 // Shared server-side Gemini client
@@ -62,7 +117,9 @@ Categories available (must pick the best fit):
 
 INTERNAL ROUTES FOR LINKING:
 - /tracker (50/30/20 Budget & Milestones Tracker)
+- /savings-goals (Deadline-Driven Savings Goals Planner)
 - /savings-simulator (Compound Savings Simulator)
+- /debt-payoff (Snowball & Avalanche Debt Payoff Calculator)
 - /daily-tools (Daily Life Expense Tools & Money Flow)
 - /category/ai-budgeting-trackers
 - /category/smart-saving-frugal-tech
@@ -284,7 +341,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`FinAI Wealth Portal Server running on http://0.0.0.0:${PORT}`);
+    console.log(`WealthFlow AI Portal Server running on http://0.0.0.0:${PORT}`);
   });
 }
 

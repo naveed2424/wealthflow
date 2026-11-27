@@ -195,7 +195,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {onOpenAboutUs && (
               <button
                 onClick={onOpenAboutUs}
-                className={`px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                className={`px-2 py-1.5 xl:px-2.5 xl:py-2 rounded-xl text-[11px] xl:text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                   currentTab === 'static'
                     ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
                     : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
@@ -207,8 +207,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </nav>
 
-          {/* Right utility buttons: Currency, AdSense Preview Toggle, Discreet Publisher Portal */}
-          <div className="hidden lg:flex items-center gap-3">
+          {/* Right utility buttons: Currency & Owner Publisher Desk */}
+          <div className="hidden lg:flex items-center gap-2.5">
             {/* Currency selector */}
             <select
               value={currencySymbol}
@@ -223,25 +223,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               ))}
             </select>
 
-            {/* AdSense Preview Layout Toggle */}
-            <button
-              onClick={onToggleAdSense}
-              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl border transition ${
-                adSenseEnabled
-                  ? 'bg-amber-950/60 text-amber-300 border-amber-500/40'
-                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
-              }`}
-              title="Toggle Google AdSense responsive slots to audit ad placement and monetization compliance"
-            >
-              <span className={`w-2 h-2 rounded-full ${adSenseEnabled ? 'bg-amber-400 animate-ping' : 'bg-slate-600'}`} />
-              AdSense: {adSenseEnabled ? 'ON' : 'OFF'}
-            </button>
-
-            {/* Secure Author & Publisher Desk (Only for the site owner) */}
+            {/* Secure Author & Publisher Desk */}
             <button
               onClick={onOpenPublisherPortal}
               className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-amber-300 hover:text-amber-200 border border-amber-500/30 text-xs font-bold px-3 py-1.5 rounded-xl transition hover:border-amber-400 shadow-sm"
-              title="Author & Publisher Portal (Restricted to site owner)"
+              title="Author & Publisher Portal"
             >
               <Lock className="w-3.5 h-3.5 text-amber-400" />
               Publisher Desk
@@ -328,15 +314,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            <div className="pt-2 border-t border-slate-800 flex items-center justify-between px-2">
-              <span className="text-xs text-slate-400">AdSense Preview</span>
-              <button
-                onClick={onToggleAdSense}
-                className="text-xs px-2.5 py-1 rounded-lg bg-slate-900 text-amber-300 border border-amber-500/30 font-bold"
-              >
-                {adSenseEnabled ? 'Units Enabled' : 'Units Hidden'}
-              </button>
-            </div>
           </div>
         )}
       </div>

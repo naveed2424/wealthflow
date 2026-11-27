@@ -1,0 +1,4 @@
+# IAB Tech Lab ads.txt for WealthFlow AI
+# Once your Google AdSense account is issued a Publisher ID (ca-pub-XXXXXXXXXXXXXXXX),
+# uncomment the line below and replace pub-0000000000000000 with your real Publisher ID:
+# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

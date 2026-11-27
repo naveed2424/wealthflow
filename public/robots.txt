@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+Sitemap: https://ais-dev-jaqzasdnamfwsy27pcee4a-128012116128.europe-west2.run.app/sitemap.xml

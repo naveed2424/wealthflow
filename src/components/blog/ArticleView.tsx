@@ -37,6 +37,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
   const [readingProgress, setReadingProgress] = useState(0);
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likes || 184);
+  const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -133,10 +134,15 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
     });
   };
 
+  const showCopyToast = (label: string) => {
+    setCopyFeedback(label);
+    setTimeout(() => setCopyFeedback(null), 2600);
+  };
+
   const handleShare = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(canonicalArticleUrl);
-      alert('Canonical article backlink copied to clipboard!');
+      showCopyToast('Article URL copied to clipboard');
     }
   };
 
@@ -149,7 +155,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         : `[${post.title} — WealthFlow AI](${canonicalArticleUrl})`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(snippet);
-      alert(`${mode.toUpperCase()} backlink copied for redirecting traffic to WealthFlow AI!`);
+      showCopyToast(`${mode.toUpperCase()} backlink copied`);
     }
   };
 
@@ -245,33 +251,15 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           </div>
         </div>
 
-        {/* AdSense Top Leaderboard */}
-        <AdBanner format="leaderboard" enabled={adSenseEnabled} />
+        {copyFeedback && (
+          <div className="mb-4 px-4 py-2 rounded-xl bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 text-xs font-bold inline-flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            {copyFeedback}
+          </div>
+        )}
 
-        {/* SEO Meta Snippet Preview Card (Demonstrating rich snippet readiness) */}
-        <div className="mb-6 p-4 rounded-2xl bg-slate-950/80 border border-emerald-500/20 text-xs">
-          <div className="flex items-center justify-between text-slate-400 font-mono text-[10px] mb-1">
-            <span className="flex items-center gap-1 text-emerald-400 font-bold">
-              <Sparkles className="w-3 h-3" />
-              SEO Snippet & Google SERP Preview
-            </span>
-            <span>Target: {post.primaryKeyword}</span>
-          </div>
-          <div className="text-emerald-400 font-medium truncate font-sans text-sm">
-            {post.metaTitle}
-          </div>
-          <div className="text-slate-400 text-xs mt-0.5 leading-relaxed">
-            {post.metaDescription}
-          </div>
-          <div className="mt-2 flex flex-wrap gap-1.5 text-[10px]">
-            <span className="text-slate-400 font-semibold">Secondary keywords:</span>
-            {post.secondaryKeywords.map((kw, i) => (
-              <span key={i} className="bg-slate-900 text-slate-300 px-2 py-0.5 rounded border border-slate-800">
-                {kw}
-              </span>
-            ))}
-          </div>
-        </div>
+        {/* Top Resource Spotlight */}
+        <AdBanner format="leaderboard" enabled={adSenseEnabled} onNavigate={onNavigateInternal} />
 
         {/* Main Article Header */}
         <header className="mb-8">
@@ -286,7 +274,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             </span>
             <span className="text-xs text-slate-400">•</span>
             <span className="text-xs font-semibold text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-500/20">
-              {post.wordCount || 2050}+ words (In-Depth)
+              {(post.wordCount || 850).toLocaleString()} words
             </span>
           </div>
 
@@ -309,7 +297,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 </div>
                 <div className="text-xs text-emerald-400 font-medium">{post.author.role}</div>
-                <div className="text-[11px] text-slate-400 mt-0.5">Published on {post.date} • Verified Fact-Checked</div>
+                <div className="text-[11px] text-slate-400 mt-0.5">Published {post.date} • Editorial Research</div>
               </div>
             </div>
 
@@ -370,8 +358,8 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             ))}
           </div>
 
-          {/* First In-Article Ad Banner */}
-          <AdBanner format="in-article" enabled={adSenseEnabled} />
+          {/* In-Article Tool Spotlight */}
+          <AdBanner format="in-article" enabled={adSenseEnabled} onNavigate={onNavigateInternal} />
 
           {/* Sections */}
           {post.sections.map((section, idx) => (
@@ -612,8 +600,8 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           </div>
         </div>
 
-        {/* AdSense Bottom Rectangle */}
-        <AdBanner format="rectangle" enabled={adSenseEnabled} />
+        {/* Bottom Tool Spotlight */}
+        <AdBanner format="rectangle" enabled={adSenseEnabled} onNavigate={onNavigateInternal} />
       </div>
     </div>
   );
